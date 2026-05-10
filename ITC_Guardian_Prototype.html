@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ITC Guardian — Masters India</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #060d16;
+    --surface:  #0d1f2d;
+    --surface2: #132435;
+    --border:   #1e3a5f;
+    --border2:  #243b55;
+    --sky:      #0ea5e9;
+    --sky-dim:  #0284c7;
+    --green:    #10b981;
+    --amber:    #f59e0b;
+    --red:      #ef4444;
+    --purple:   #a855f7;
+    --text:     #e2e8f0;
+    --muted:    #64748b;
+    --muted2:   #94a3b8;
+    --card-glow: 0 0 0 1px var(--border), 0 8px 32px rgba(0,0,0,.5);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Header ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    height: 56px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: .02em;
+  }
+
+  .logo-badge {
+    background: linear-gradient(135deg, var(--sky) 0%, #7c3aed 100%);
+    border-radius: 8px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .logo-sub { color: var(--muted2); font-size: 11px; font-family: 'IBM Plex Mono', monospace; font-weight: 400; letter-spacing: .05em; }
+
+  nav { display: flex; gap: 4px; }
+  .nav-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 12.5px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    background: transparent;
+    color: var(--muted2);
+    transition: all .15s;
+  }
+  .nav-btn:hover { background: var(--surface2); color: var(--text); }
+  .nav-btn.active { background: var(--sky); color: #fff; }
+
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--sky) 0%, #7c3aed 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px;
+  }
+
+  /* ── Layout ── */
+  .layout { display: grid; grid-template-columns: 1fr 360px; height: calc(100vh - 56px); }
+  .main-panel { overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+  .chat-panel { border-left: 1px solid var(--border); display: flex; flex-direction: column; background: var(--surface); }
+
+  /* ── KPI Row ── */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    border-radius: 12px 12px 0 0;
+  }
+  .kpi-card.sky::before   { background: var(--sky); }
+  .kpi-card.green::before { background: var(--green); }
+  .kpi-card.amber::before { background: var(--amber); }
+  .kpi-card.purple::before{ background: var(--purple); }
+  .kpi-card:hover { border-color: var(--border2); }
+
+  .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; font-family: 'IBM Plex Mono', monospace; }
+  .kpi-val { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 26px; line-height: 1; margin-bottom: 6px; }
+  .kpi-card.sky   .kpi-val { color: var(--sky); }
+  .kpi-card.green .kpi-val { color: var(--green); }
+  .kpi-card.amber .kpi-val { color: var(--amber); }
+  .kpi-card.purple .kpi-val{ color: var(--purple); }
+  .kpi-sub { font-size: 11px; color: var(--muted2); }
+
+  /* ── Section header ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .count-badge {
+    font-size: 10px;
+    background: var(--border2);
+    color: var(--muted2);
+    padding: 2px 7px;
+    border-radius: 99px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .filter-row { display: flex; gap: 6px; }
+  .filter-btn {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted2);
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    transition: all .15s;
+  }
+  .filter-btn:hover, .filter-btn.active { border-color: var(--sky); color: var(--sky); background: rgba(14,165,233,.08); }
+
+  /* ── Table ── */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: var(--surface2); }
+  th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12.5px;
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+  .tr-highlight td { background: rgba(239,68,68,.04); }
+  .tr-highlight:hover td { background: rgba(239,68,68,.08); }
+
+  .inv-id { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--text); font-weight: 600; }
+  .inv-gstin { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .inv-vendor { font-size: 12px; color: var(--muted2); }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px; border-radius: 99px;
+    font-size: 10px; font-weight: 600;
+    font-family: 'IBM Plex Mono', monospace;
+    white-space: nowrap;
+  }
+  .badge-green  { background: rgba(16,185,129,.15); color: var(--green); border: 1px solid rgba(16,185,129,.3); }
+  .badge-amber  { background: rgba(245,158,11,.15);  color: var(--amber); border: 1px solid rgba(245,158,11,.3); }
+  .badge-red    { background: rgba(239,68,68,.15);   color: var(--red);   border: 1px solid rgba(239,68,68,.3); }
+  .badge-muted  { background: rgba(100,116,139,.15); color: var(--muted2);border: 1px solid rgba(100,116,139,.3); }
+
+  .risk-dots { display: flex; gap: 3px; align-items: center; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot.filled-red    { background: var(--red); }
+  .dot.filled-amber  { background: var(--amber); }
+  .dot.filled-sky    { background: var(--sky); }
+  .dot.empty         { background: var(--border2); }
+
+  .itc-amt { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; font-weight: 600; }
+  .itc-risk { color: var(--red); }
+
+  .action-btn {
+    padding: 5px 12px;
+    border-radius: 7px;
+    border: none;
+    cursor: pointer;
+    font-size: 11px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    transition: all .15s;
+  }
+  .action-btn.nudge { background: rgba(245,158,11,.15); color: var(--amber); border: 1px solid rgba(245,158,11,.3); }
+  .action-btn.nudge:hover { background: var(--amber); color: #fff; }
+  .action-btn.view  { background: rgba(14,165,233,.12); color: var(--sky); border: 1px solid rgba(14,165,233,.25); }
+  .action-btn.view:hover { background: var(--sky); color: #fff; }
+
+  /* ── Chat Panel ── */
+  .chat-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .chat-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ai-indicator {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--green);
+  }
+  .pulse {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+
+  .chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+  .msg { display: flex; flex-direction: column; gap: 4px; animation: fadeUp .3s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)} }
+  .msg-role {
+    font-size: 9px; font-family: 'IBM Plex Mono', monospace;
+    text-transform: uppercase; letter-spacing: .1em;
+    color: var(--muted);
+  }
+  .msg-bubble {
+    padding: 10px 13px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    line-height: 1.55;
+    max-width: 100%;
+  }
+  .msg-user .msg-bubble  { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 10px 10px 3px 10px; }
+  .msg-ai .msg-role      { color: var(--sky); }
+  .msg-ai .msg-bubble    { background: rgba(14,165,233,.08); border: 1px solid rgba(14,165,233,.2); color: var(--text); border-radius: 10px 10px 10px 3px; }
+
+  .chat-actions { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 16px 10px; }
+  .quick-btn {
+    padding: 5px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted2);
+    font-size: 10.5px;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    transition: all .15s;
+  }
+  .quick-btn:hover { border-color: var(--sky); color: var(--sky); background: rgba(14,165,233,.07); }
+
+  .chat-input-row {
+    padding: 12px 14px;
+    border-top: 1px solid var(--border);
+    display: flex; gap: 8px;
+  }
+  .chat-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 9px 13px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .chat-input:focus { border-color: var(--sky); }
+  .chat-input::placeholder { color: var(--muted); }
+
+  .send-btn {
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    border: none;
+    background: var(--sky);
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+    flex-shrink: 0;
+  }
+  .send-btn:hover { background: var(--sky-dim); }
+
+  /* ── Health bar ── */
+  .health-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .health-label { font-size: 12px; color: var(--muted2); font-weight: 500; flex-shrink: 0; }
+  .health-bar-wrap { flex: 1; background: var(--border); border-radius: 99px; height: 8px; position: relative; overflow: hidden; }
+  .health-bar { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--green) 0%, var(--sky) 100%); width: 82%; transition: width .5s ease; }
+  .health-pct { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 20px; color: var(--green); flex-shrink: 0; }
+  .health-note { font-size: 11px; color: var(--muted2); flex-shrink: 0; }
+
+  /* ── scrollbar ── */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+
+  .tag { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 9.5px; font-family: 'IBM Plex Mono', monospace; margin-left: 6px; }
+  .tag-sky { background: rgba(14,165,233,.12); color: var(--sky); }
+
+  /* Toolbar row */
+  .toolbar { display: flex; align-items: center; justify-content: space-between; }
+  .toolbar-left { display: flex; align-items: center; gap: 10px; }
+  .search-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    color: var(--text);
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    width: 220px;
+    transition: border-color .15s;
+  }
+  .search-box:focus { border-color: var(--sky); }
+  .search-box::placeholder { color: var(--muted); }
+
+  .export-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted2);
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .export-btn:hover { border-color: var(--sky); color: var(--sky); }
+  .run-ai-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: none;
+    background: var(--sky);
+    color: #fff;
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .run-ai-btn:hover { background: var(--sky-dim); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div style="display:flex;align-items:center;gap:20px;">
+    <div class="logo">
+      <div class="logo-badge">⚡</div>
+      <div>
+        ITC Guardian
+        <div class="logo-sub">MASTERS INDIA · GSP CERTIFIED</div>
+      </div>
+    </div>
+    <nav>
+      <button class="nav-btn active">Dashboard</button>
+      <button class="nav-btn">Reconciliation</button>
+      <button class="nav-btn">Vendors</button>
+      <button class="nav-btn">Reports</button>
+    </nav>
+  </div>
+  <div class="header-right">
+    <div style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;">FY 2025–26 · Q1</div>
+    <div class="avatar">RK</div>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <!-- MAIN -->
+  <div class="main-panel">
+
+    <!-- KPI Row -->
+    <div class="kpi-row">
+      <div class="kpi-card sky">
+        <div class="kpi-label">ITC Recovered</div>
+        <div class="kpi-val">₹12.4L</div>
+        <div class="kpi-sub">↑ 18% vs Q4 FY25</div>
+      </div>
+      <div class="kpi-card amber">
+        <div class="kpi-label">At Risk</div>
+        <div class="kpi-val">₹3.2L</div>
+        <div class="kpi-sub">14 invoices need action</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">Nudges Sent</div>
+        <div class="kpi-val">83</div>
+        <div class="kpi-sub">61% vendor response rate</div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-label">Hours Saved</div>
+        <div class="kpi-val">340h</div>
+        <div class="kpi-sub">vs manual reconciliation</div>
+      </div>
+    </div>
+
+    <!-- ITC Health Bar -->
+    <div class="health-section">
+      <div class="health-label">ITC Health Score</div>
+      <div class="health-bar-wrap"><div class="health-bar"></div></div>
+      <div class="health-pct">82%</div>
+      <div class="health-note" style="color:var(--green);">↑ 14 pts from last quarter</div>
+    </div>
+
+    <!-- Reconciliation Table -->
+    <div>
+      <div class="section-header">
+        <div class="section-title">
+          Reconciliation Queue
+          <span class="count-badge">247 entries</span>
+          <span class="tag tag-sky">AI-matched</span>
+        </div>
+        <div class="toolbar-left">
+          <input class="search-box" placeholder="🔍  Search GSTIN or invoice…" />
+          <div class="filter-row">
+            <button class="filter-btn active">All</button>
+            <button class="filter-btn">Mismatch</button>
+            <button class="filter-btn">Pending</button>
+            <button class="filter-btn">Matched</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="toolbar" style="margin-bottom:10px;">
+          <div></div>
+          <div style="display:flex;gap:8px;">
+            <button class="export-btn">↓ Export CSV</button>
+            <button class="run-ai-btn">✦ Run AI Reconciliation</button>
+          </div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Invoice</th>
+              <th>Vendor</th>
+              <th>Status</th>
+              <th>Risk</th>
+              <th>ITC Amount</th>
+              <th>GSTR-2B</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="tr-highlight">
+              <td>
+                <div class="inv-id">INV-2024-0441</div>
+                <div class="inv-gstin">09AAACM3025F1ZX</div>
+              </td>
+              <td><div class="inv-vendor">Verma Metals Pvt. Ltd.</div></td>
+              <td><span class="badge badge-red">● Mismatch</span></td>
+              <td><div class="risk-dots">
+                <div class="dot filled-red"></div><div class="dot filled-red"></div>
+                <div class="dot filled-red"></div><div class="dot empty"></div><div class="dot empty"></div>
+              </div></td>
+              <td><div class="itc-amt itc-risk">₹18,400</div></td>
+              <td><span class="badge badge-red">Not Filed</span></td>
+              <td><button class="action-btn nudge" onclick="sendNudge('INV-2024-0441','Verma Metals')">⚡ Nudge</button></td>
+            </tr>
+            <tr class="tr-highlight">
+              <td>
+                <div class="inv-id">INV-2024-0389</div>
+                <div class="inv-gstin">07AADCS5342L1ZR</div>
+              </td>
+              <td><div class="inv-vendor">SteelCraft Industries</div></td>
+              <td><span class="badge badge-amber">◐ Pending</span></td>
+              <td><div class="risk-dots">
+                <div class="dot filled-amber"></div><div class="dot filled-amber"></div>
+                <div class="dot empty"></div><div class="dot empty"></div><div class="dot empty"></div>
+              </div></td>
+              <td><div class="itc-amt itc-risk">₹9,250</div></td>
+              <td><span class="badge badge-amber">Partial</span></td>
+              <td><button class="action-btn nudge" onclick="sendNudge('INV-2024-0389','SteelCraft')">⚡ Nudge</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="inv-id">INV-2024-0372</div>
+                <div class="inv-gstin">27AACCG3671P1ZH</div>
+              </td>
+              <td><div class="inv-vendor">Gujarat Polymers Co.</div></td>
+              <td><span class="badge badge-green">✓ Matched</span></td>
+              <td><div class="risk-dots">
+                <div class="dot filled-sky"></div><div class="dot empty"></div>
+                <div class="dot empty"></div><div class="dot empty"></div><div class="dot empty"></div>
+              </div></td>
+              <td><div class="itc-amt" style="color:var(--green)">₹34,750</div></td>
+              <td><span class="badge badge-green">Filed</span></td>
+              <td><button class="action-btn view" onclick="viewInvoice('INV-2024-0372')">View</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="inv-id">INV-2024-0355</div>
+                <div class="inv-gstin">06AAACM8877K1ZP</div>
+              </td>
+              <td><div class="inv-vendor">Haryana Electric Supplies</div></td>
+              <td><span class="badge badge-green">✓ Matched</span></td>
+              <td><div class="risk-dots">
+                <div class="dot empty"></div><div class="dot empty"></div>
+                <div class="dot empty"></div><div class="dot empty"></div><div class="dot empty"></div>
+              </div></td>
+              <td><div class="itc-amt" style="color:var(--green)">₹12,100</div></td>
+              <td><span class="badge badge-green">Filed</span></td>
+              <td><button class="action-btn view" onclick="viewInvoice('INV-2024-0355')">View</button></td>
+            </tr>
+            <tr class="tr-highlight">
+              <td>
+                <div class="inv-id">INV-2024-0348</div>
+                <div class="inv-gstin">08AADCE4312G1ZF</div>
+              </td>
+              <td><div class="inv-vendor">Rajasthan Cement Works</div></td>
+              <td><span class="badge badge-red">● Mismatch</span></td>
+              <td><div class="risk-dots">
+                <div class="dot filled-red"></div><div class="dot filled-red"></div>
+                <div class="dot filled-red"></div><div class="dot filled-red"></div><div class="dot empty"></div>
+              </div></td>
+              <td><div class="itc-amt itc-risk">₹41,800</div></td>
+              <td><span class="badge badge-red">Not Filed</span></td>
+              <td><button class="action-btn nudge" onclick="sendNudge('INV-2024-0348','Rajasthan Cement')">⚡ Nudge</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="inv-id">INV-2024-0301</div>
+                <div class="inv-gstin">19AAACS9178B1ZO</div>
+              </td>
+              <td><div class="inv-vendor">Bengal Paper Mills Ltd.</div></td>
+              <td><span class="badge badge-muted">… Pending</span></td>
+              <td><div class="risk-dots">
+                <div class="dot filled-amber"></div><div class="dot empty"></div>
+                <div class="dot empty"></div><div class="dot empty"></div><div class="dot empty"></div>
+              </div></td>
+              <td><div class="itc-amt" style="color:var(--amber)">₹6,300</div></td>
+              <td><span class="badge badge-muted">Not Due</span></td>
+              <td><button class="action-btn view" onclick="viewInvoice('INV-2024-0301')">View</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /main-panel -->
+
+  <!-- CHAT PANEL -->
+  <div class="chat-panel">
+    <div class="chat-header">
+      <div class="chat-title">
+        ✦ ITC AI Assistant
+      </div>
+      <div class="ai-indicator">
+        <div class="pulse"></div>
+        Claude · Live
+      </div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg msg-ai">
+        <div class="msg-role">ITC Guardian AI</div>
+        <div class="msg-bubble">
+          👋 Hi Rakesh! I've completed your Q1 reconciliation.<br><br>
+          <strong>3 invoices need immediate action</strong> — total ITC at risk: <strong style="color:var(--red)">₹69,450</strong>.<br><br>
+          Rajasthan Cement Works (INV-0348) is your highest risk at ₹41,800. Their GSTR-1 is overdue by 18 days. Want me to send a WhatsApp nudge?
+        </div>
+      </div>
+      <div class="msg msg-user">
+        <div class="msg-role">You</div>
+        <div class="msg-bubble">Yes, send a nudge to Rajasthan Cement. Also why is INV-0441 blocked?</div>
+      </div>
+      <div class="msg msg-ai">
+        <div class="msg-role">ITC Guardian AI</div>
+        <div class="msg-bubble">
+          ✅ WhatsApp nudge sent to Rajasthan Cement Works (GSTIN: 08AADCE4312G1ZF).<br><br>
+          <strong>INV-0441 (Verma Metals):</strong> Their GSTR-1 for October 2024 hasn't been filed. This means ₹18,400 in ITC won't appear in your GSTR-2B until they file. If they don't file before the annual deadline, this ITC is permanently blocked.<br><br>
+          💡 Suggested action: Send escalation email + WhatsApp. I can draft both.
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-actions">
+      <button class="quick-btn" onclick="quickSend('Nudge all mismatched vendors')">Nudge all vendors</button>
+      <button class="quick-btn" onclick="quickSend('Show ITC trend this year')">ITC trend</button>
+      <button class="quick-btn" onclick="quickSend('Draft escalation email for Verma Metals')">Draft email</button>
+      <button class="quick-btn" onclick="quickSend('Who is our highest-risk vendor?')">Top risk vendor</button>
+    </div>
+
+    <div class="chat-input-row">
+      <input class="chat-input" id="chatInput" placeholder="Ask about any invoice or vendor…" onkeydown="handleKey(event)" />
+      <button class="send-btn" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const responses = {
+  'nudge all mismatched vendors': '✅ Sending WhatsApp nudges to 3 vendors with mismatches:<br><br>1. <strong>Verma Metals</strong> (INV-0441) — ₹18,400 at risk<br>2. <strong>SteelCraft Industries</strong> (INV-0389) — ₹9,250 at risk<br>3. <strong>Rajasthan Cement</strong> (INV-0348) — ₹41,800 at risk<br><br>All 3 nudges sent. I\'ll notify you when they respond.',
+  'show itc trend this year': '📈 <strong>ITC Recovery Trend FY 2025–26:</strong><br><br>Q4 FY25: ₹10.5L (68% recovery)<br>Q1 FY26: ₹12.4L (82% recovery) ↑<br><br>Top improvement: Vendor nudge automation increased on-time filing by 23%. At this rate, you\'re on track to recover ₹14L in Q2.',
+  'draft escalation email for verma metals': '📧 <strong>Draft escalation email:</strong><br><br>Subject: Urgent — GST Return Filing Required (INV-0441)<br><br>Dear Verma Metals Team,<br>This is a follow-up regarding Invoice #INV-0441 dated Oct 15, 2024 (₹1,02,222 + GST). Your GSTR-1 for October 2024 is pending, blocking ₹18,400 in ITC on our side.<br><br>Kindly file at your earliest. Want me to send this?',
+  'who is our highest-risk vendor?': '⚠️ <strong>Highest risk vendor: Rajasthan Cement Works</strong><br><br>ITC at risk: <strong style="color:var(--red)">₹41,800</strong><br>GSTR-1 overdue by: 18 days<br>Past compliance score: 71% (3 late filings in FY25)<br><br>Recommendation: Consider requesting advance payment or switching to a compliant alternative for Q2.',
+};
+
+const aiTyping = [
+  'Analysing invoice data…',
+  'Cross-referencing GSTR-2B…',
+  'Calculating ITC at risk…',
+];
+
+function getResponse(msg) {
+  const key = msg.toLowerCase().replace(/[^a-z0-9 ]/g,'').trim();
+  for (const [k, v] of Object.entries(responses)) {
+    if (key.includes(k.split(' ')[0]) || key === k) return v;
+  }
+  return `I've analysed your query: "<em>${msg}</em>".<br><br>Based on your current reconciliation data, I found <strong>3 actionable items</strong> related to this. Would you like me to generate a detailed breakdown or send vendor alerts?`;
+}
+
+function addMessage(role, html) {
+  const chat = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = `msg msg-${role}`;
+  div.innerHTML = `<div class="msg-role">${role === 'user' ? 'You' : 'ITC Guardian AI'}</div><div class="msg-bubble">${html}</div>`;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  addMessage('user', msg);
+
+  // Typing indicator
+  const chat = document.getElementById('chatMessages');
+  const typingDiv = document.createElement('div');
+  typingDiv.className = 'msg msg-ai';
+  typingDiv.id = 'typing';
+  typingDiv.innerHTML = `<div class="msg-role">ITC Guardian AI</div><div class="msg-bubble" style="color:var(--muted2);font-style:italic;">Thinking…</div>`;
+  chat.appendChild(typingDiv);
+  chat.scrollTop = chat.scrollHeight;
+
+  setTimeout(() => {
+    const t = document.getElementById('typing');
+    if (t) t.remove();
+    addMessage('ai', getResponse(msg));
+  }, 1200);
+}
+
+function quickSend(msg) {
+  document.getElementById('chatInput').value = msg;
+  sendMessage();
+}
+
+function handleKey(e) { if (e.key === 'Enter') sendMessage(); }
+
+function sendNudge(inv, vendor) {
+  addMessage('user', `Send a WhatsApp nudge to ${vendor} for ${inv}`);
+  setTimeout(() => addMessage('ai', `✅ WhatsApp nudge sent to <strong>${vendor}</strong> for invoice <strong>${inv}</strong>.<br><br>Message: <em>"Dear ${vendor}, your GSTR-1 return is pending. This is blocking our ITC claim. Please file at the earliest to avoid further delays."</em><br><br>I'll notify you when they respond or file their return.`), 1100);
+}
+
+function viewInvoice(inv) {
+  addMessage('user', `Show me details for ${inv}`);
+  setTimeout(() => addMessage('ai', `📄 <strong>Invoice ${inv} — Full Details</strong><br><br>Status: <strong style="color:var(--green)">✓ Matched</strong><br>ITC Eligible: ₹34,750<br>GSTR-2B Status: Filed on time<br>Risk Score: 1/5 (Very Low)<br><br>This invoice is fully reconciled. No action required.`), 1100);
+}
+
+// Filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+// Nav buttons
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
